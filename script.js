@@ -1,4 +1,4 @@
-document.getElementById('user').value = 'TAB_TSIW_OIP_USER TAB_TSIW6_OIP_USER'
+document.getElementById('user').value = ''
 
 function findTables() {
     const synonym_str = document.getElementById('synonym').value;
