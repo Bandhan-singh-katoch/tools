@@ -23,8 +23,8 @@ function generateQuery() {
     users = users.map(str=> str.trim()).filter(str=>(str && str.length>1))
 
     const synonym_str = document.getElementById('synonym').value;
-    synonym_list = synonym_str.split(' ')
-    synonym_list = synonym_list.map(str=> str.trim())
+    synonym_list = synonym_str.split(/[\s\n]+/)
+    synonym_list = synonym_list.map(str=> str.trim()).filter(str=>(str && str.length>1))
     
 
     const tables = document.getElementById('tables').value;
