@@ -2,15 +2,15 @@ document.getElementById('user').value = ''
 
 function findTables() {
     const synonym_str = document.getElementById('synonym').value;
-    synonym_list = synonym_str.split(' ')
-    synonym_list = synonym_list.map(str=> str.trim())
-    
+    synonym_list = synonym_str.split(/[\s\n]+/)
+    synonym_list = synonym_list.map(str=> str.trim()).filter(str=>(str && str.length>1))
+    console.log("synonym_list------>",synonym_list)
     find_table = ''
     for(let i =0 ; i<synonym_list.length; i++){
       syn = synonym_list[i].split('.')
       find_table += ` select table_owner || '.' || table_name as name from all_synonyms where owner = '${syn[0]}' and synonym_name = '${syn[1]}'`
       if(i != synonym_list.length-1){
-        find_table += ' union '
+        find_table += ' union all'
       }
     }
     find_table =  `select listagg(name, ' ') from ( ` + find_table + ` )`
@@ -18,8 +18,9 @@ function findTables() {
 }
 
 function generateQuery() {
-    const users_str = document.getElementById('user').value;  
-    users = users_str.split(' ')
+    const users_str = document.getElementById('user').value;
+    users = users_str.split(/[\s\n]+/)
+    users = users.map(str=> str.trim()).filter(str=>(str && str.length>1))
 
     const synonym_str = document.getElementById('synonym').value;
     synonym_list = synonym_str.split(' ')
@@ -28,8 +29,8 @@ function generateQuery() {
 
     const tables = document.getElementById('tables').value;
     
-    table_list = tables.length>1 ? tables.split(' '): []
-    table_list = table_list.map(str=> str.trim())
+    table_list = tables.length>1 ? tables.split(/[\s\n]+/): []
+    table_list = table_list.map(str=> str.trim()).filter(str=>(str && str.length>1))
     let objects_list = []
     for(let i = 0; i<table_list.length; i++){
       objects_list.push(table_list[i])
