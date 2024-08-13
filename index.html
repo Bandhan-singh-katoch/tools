@@ -42,7 +42,7 @@
     color: #333;
 }
 
-.form-group textarea {
+.form-group textarea, input {
     width: 100%;
     padding: 10px;
     border-radius: 4px;
@@ -51,7 +51,7 @@
     resize: vertical;
 }
 
-.form-group textarea:focus {
+.form-group textarea,input:focus {
     border-color: #5a67d8;
     outline: none;
     box-shadow: 0 0 5px rgba(90, 103, 216, 0.5);
@@ -108,6 +108,12 @@ button:hover {
             <label for="tables">Tables:</label>
             <textarea id="tables" placeholder="Enter table names" rows="3"></textarea>
         </div>
+
+        <div class="form-group">
+            <label for="accessType">Access Type:</label>
+            <input id="accessType" placeholder="Enter access type" rows="3">
+        </div>
+
         <button onclick="generateQuery()">Generate Query</button>
 
         <div class="result" id="generateQueryResult"></div>
