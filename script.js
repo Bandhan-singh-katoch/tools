@@ -1,4 +1,5 @@
 document.getElementById('user').value = ''
+document.getElementById('accessType').value = 'select'
 
 function findTables() {
     const synonym_str = document.getElementById('synonym').value;
@@ -26,6 +27,7 @@ function generateQuery() {
     synonym_list = synonym_str.split(/[\s\n]+/)
     synonym_list = synonym_list.map(str=> str.trim()).filter(str=>(str && str.length>1))
     
+    const accessType = document.getElementById('accessType').value;
 
     const tables = document.getElementById('tables').value;
     
@@ -48,7 +50,7 @@ function generateQuery() {
     
     for(let i = 0; i<users.length; i++){
       for(let j = 0; j<objects_list.length; j++){
-        grant_access += `grant select on ${objects_list[j]} to ${users[i]}; \n`
+        grant_access += `grant ${accessType} on ${objects_list[j]} to ${users[i]}; \n`
       }
     }
     
