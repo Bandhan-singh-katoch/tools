@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            width: calc(100% - 300px);
+        }
+
+        .container h2 {
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group textarea,
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            resize: vertical;
+            display: inline-block;
+        }
+
+        .form-group textarea:focus,
+        input:focus {
+            border-color: #5a67d8;
+            outline: none;
+            box-shadow: 0 0 5px rgba(90, 103, 216, 0.5);
+        }
+
+        .form-group textarea {
+            height: 180px;
+        }
+
+        .undo-btn,
+        .copy-btn {
+            display: inline-block;
+            padding: 5px;
+            padding-left: 20px;
+            padding-right: 20px;
+            margin-left: 10px;
+            margin-bottom: 7px;
+            background-color: #e2e8f0;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: fit-content;
+        }
+
+        .undo-btn:hover,
+        .copy-btn:hover {
+            background-color: #d4d8dd;
+        }
+
+        button {
+            width: 30%;
+            padding: 12px;
+            background-color: #5a67d8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        button:hover {
+            background-color: #4c51bf;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .label-undo-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-notification {
+            display: none;
+            font-size: 12px;
+            color: green;
+            margin-left: 15px;
+        }
+
+        .copy-notification.active {
+            display: inline;
+        }
+
+        .column-count{
+            margin-right: 10px; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Text Formatter</h2>
+
+        <div class="form-group">
+            <div class="label-undo-btn">
+                <label for="inputText">Input Text:</label>
+                
+                <div >
+
+                    <span id="columnCount" class="column-count" >Columns: 0</span>
+                    <button class="undo-btn" onclick="undoLastAction()">
+                        <i class="fas fa-undo"></i> Undo
+                    </button>
+                    <button class="copy-btn" onclick="copyText()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <span id="copyNotification" class="copy-notification">Text Copied!</span>
+                </div>
+            </div>
+
+            <textarea id="inputText" placeholder="Enter your sentence here" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+            <input id="separator" placeholder="Enter separator" />
+        </div>
+
+        <div class="button-row">
+            <button onclick="convertToUpperCase()">
+                <i class="fas fa-text-height"></i> Upper Case
+            </button>
+            <button onclick="convertToLowerCase()">
+                <i class="fas fa-text-width"></i> Lower Case
+            </button>
+            <button onclick="removeExtraSpaces()">
+                <i class="fas fa-broom"></i> Clean Text
+            </button>
+        </div>
+
+        <div class="button-row">
+            <button onclick="addSeparator()">
+                <i class="fas fa-plus"></i> Add Separator
+            </button>
+            <button onclick="surroundWithQuotes()">
+                <i class="fas fa-quote-right"></i> Double Quotes
+            </button>
+            <button onclick="convertToNewlineSeparated()">
+                <i class="fas fa-text-slash"></i> Newline
+            </button>
+        </div>
+
+        <div class="button-row">
+            <button onclick="createSql()">
+                <i class="fas fa-database"></i> Create SQL
+            </button>
+            <button onclick="extractColumns()">
+                <i class="fas fa-columns"></i> Extract Columns
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        let historyStack = [];
+        let separatorApplied = false;
+
+        function getInputText() {
+            return document.getElementById('inputText').value;
+        }
+
+        function setInputText(value) {
+            document.getElementById('inputText').value = value;
+        }
+
+        function saveState() {
+            historyStack.push(getInputText());
+        }
+
+        function undoLastAction() {
+            if (historyStack.length > 0) {
+                setInputText(historyStack.pop());
+            }
+        }
+
+        function copyText() {
+            const inputText = getInputText();
+            navigator.clipboard.writeText(inputText).then(() => {
+                const notification = document.getElementById('copyNotification');
+                notification.classList.add('active');
+                setTimeout(() => {
+                    notification.classList.remove('active');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function convertToUpperCase() {
+            saveState();
+            const inputText = getInputText();
+            const result = inputText.toUpperCase();
+            setInputText(result);
+        }
+
+        function convertToLowerCase() {
+            saveState();
+            const inputText = getInputText();
+            const result = inputText.toLowerCase();
+            setInputText(result);
+        }
+
+        function removeExtraSpaces() {
+            saveState();
+            const inputText = getInputText();
+            const result = inputText.replace(/\s+/g, ' ').trim();
+            setInputText(result);
+        }
+
+        function addSeparator() {
+                saveState();
+                const inputText = getInputText();
+                const separator = document.getElementById('separator').value || ',';
+
+                if (separatorApplied) {
+                    // Separator is applied, so remove it
+                    const words = inputText.split(new RegExp(`\\s*${separator}\\s*`, 'g')).filter(str => str.trim().length > 0);
+                    const result = words.join(' '); // Join back with a single space
+                    setInputText(result);
+                    separatorApplied = false; // Mark separator as removed
+                } else {
+                    // Separator is not applied, so add it
+                    const words = inputText.split(/[\s\n]+/).filter(str => str.trim().length > 0);
+                    const result = words.join(`${separator} `);
+                    setInputText(result);
+                    separatorApplied = true; // Mark separator as applied
+                }
+            }
+
+        function surroundWithQuotes() {
+                saveState();
+                const inputText = getInputText();
+
+                // Split input text by whitespace
+                const words = inputText.split(/[\s\n]+/).filter(str => str.trim().length > 0);
+
+                // Check if the first word has quotes, if so, we'll remove them
+                const isQuoted = words.every(word => word.startsWith('"') && word.endsWith('"'));
+
+                const result = isQuoted
+                    ? words.map(word => word.slice(1, -1)).join(' ') // Remove quotes if already present
+                    : words.map(word => `"${word}"`).join(' '); // Add quotes if not present
+
+                setInputText(result);
+            }
+
+
+        function convertToNewlineSeparated() {
+            saveState();
+            const inputText = getInputText();
+            const result = inputText.replace(/\s+/g, '\n').trim();
+            setInputText(result);
+        }
+
+        function createSql() {
+            saveState();
+            const inputText = getInputText();
+            const result = "Select " + inputText + " \nfrom \nlimit 10";
+            setInputText(result);
+        }
+
+        function extractColumns() {
+                saveState();
+                const inputText = getInputText();
+
+                // Extract column names using regex
+                const regex = /"([^"]+)"\s+\w+/g;
+                const columns = [];
+                let match;
+                while ((match = regex.exec(inputText)) !== null) {
+                    columns.push(match[1]);
+                }
+
+                // Set the column names back into the input field
+                setInputText(columns.join('\n'));
+
+                // Update the column count before the Undo button
+                const columnCountElement = document.getElementById('columnCount');
+                columnCountElement.textContent = `Columns: ${columns.length}`;
+            }
+
+
+
+
+    </script>
+
+</body>
+
+</html>
