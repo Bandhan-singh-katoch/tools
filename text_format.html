@@ -220,6 +220,7 @@
     <script>
         let historyStack = [];
         let separatorApplied = false;
+        let showCopied = true;
 
         function getInputText() {
             return document.getElementById('inputText').value;
@@ -242,11 +243,14 @@
         function copyText() {
             const inputText = getInputText();
             navigator.clipboard.writeText(inputText).then(() => {
-                const notification = document.getElementById('copyNotification');
-                notification.classList.add('active');
-                setTimeout(() => {
-                    notification.classList.remove('active');
-                }, 2000);
+                if(showCopied){
+                    const notification = document.getElementById('copyNotification');
+                    notification.classList.add('active');
+                    setTimeout(() => {
+                        notification.classList.remove('active');
+                    }, 2000);
+                }
+                showCopied = true;
             }).catch(err => {
                 console.error('Failed to copy: ', err);
             });
@@ -348,15 +352,21 @@
 
             function toggleIframe() {
                     const iframe = document.getElementById("myIframe");
-                    const button = document.getElementById("toggleIframeBtn");
-
-                    if (iframe.classList.contains("disabled")) {
-                        iframe.classList.remove("disabled");
-                        // button.textContent = "Disable";
-                    } else {
-                        iframe.classList.add("disabled");
-                        // button.textContent = "Enable";
-                    }
+                    showCopied = false;
+                    copyText()
+                    window.open('https://codeshare.io/71939f4913d6c09f6323', '_blank');
+                    
+                    
+                    // const button = document.getElementById("toggleIframeBtn");
+                    // if (iframe.classList.contains("disabled")) {
+                    //     iframe.classList.remove("disabled");
+                    //     showCopied = false;
+                    //     copyText()
+                    //     // button.textContent = "Disable";
+                    // } else {
+                    //     iframe.classList.add("disabled");
+                    //     // button.textContent = "Enable";
+                    // }
                 }
 
             function insertText() {
