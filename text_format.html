@@ -131,6 +131,15 @@
             margin-right: 10px; 
             font-weight: bold;
         }
+        #myIframe.disabled {
+    pointer-events: none; /* Disables interaction */
+    opacity: 0; /* Makes it visually appear disabled */
+}
+
+       #myIframe{
+        margin-top: 30px;
+       }
+
     </style>
 </head>
 
@@ -193,6 +202,17 @@
             <button onclick="extractColumns()">
                 <i class="fas fa-columns"></i> Extract Columns
             </button>
+            <button id="toggleIframeBtn" onclick="toggleIframe()">
+                <i class="fas fa-columns"></i> Share text
+            </button>
+        </div>
+
+
+        <div>
+            <iframe id="myIframe" class="disabled" src="https://codeshare.io/band" width="100%" height="500px"
+                style="border: none;"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+
         </div>
 
     </div>
@@ -326,6 +346,42 @@
             }
 
 
+            function toggleIframe() {
+                    const iframe = document.getElementById("myIframe");
+                    const button = document.getElementById("toggleIframeBtn");
+
+                    if (iframe.classList.contains("disabled")) {
+                        iframe.classList.remove("disabled");
+                        // button.textContent = "Disable";
+                    } else {
+                        iframe.classList.add("disabled");
+                        // button.textContent = "Enable";
+                    }
+                }
+
+            function insertText() {
+                    // Get the text from the textarea
+                    const textToPaste = getInputText();
+
+                    // Access the iframe and its content
+                    let iframe = document.getElementById('codeshareIframe');
+                    let iframeDocument = iframe.contentWindow.document;
+
+                    // Ensure the iframe document is fully loaded
+                    iframe.onload = function () {
+                        // Check if the iframe contains the editor
+                        let editor = iframeDocument.querySelector('.CodeMirror-code');
+                        if (editor) {
+                            // Access the CodeMirror instance via the iframe's window
+                            let cm = iframe.contentWindow.CodeMirror;
+
+                            // Insert the text into the CodeMirror editor
+                            cm.setValue(textToPaste);
+                        } else {
+                            console.log('Editor not found!');
+                        }
+                    };
+                }
 
 
     </script>
