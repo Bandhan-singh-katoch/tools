@@ -18,6 +18,22 @@ function findTables() {
     document.getElementById('findTableQuery').innerText = find_table;
 }
 
+function generateTables(){
+  const synonym_str = document.getElementById('synonym').value;
+  synonym_list = synonym_str.split(/[\s\n]+/)
+  synonym_list = synonym_list.map(str=> str.trim()).filter(str=>(str && str.length>1))
+
+  let tableStr = ''
+
+  for(let i = 0; i<synonym_list.length; i++){
+      if(synonym_list[i].slice(-5) == 'OS001'){
+        tableStr += synonym_list[i].slice(0, -5) + 'OT001\n' +  synonym_list[i].slice(0, -5) + 'OT002\n'
+      }
+    }
+  document.getElementById('tables').value = tableStr;
+ 
+}
+
 function generateQuery() {
     const users_str = document.getElementById('user').value;
     users = users_str.split(/[\s\n]+/)
@@ -45,6 +61,8 @@ function generateQuery() {
     }
     
     objects_list = [...synonym_list, ...objects_list]
+
+    objects_list = [...new Set(objects_list)];
     
     grant_access = ''
     
