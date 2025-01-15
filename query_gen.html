@@ -20,8 +20,7 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            /* Increased width */
+            max-width: 800px;
             margin: auto;
         }
 
@@ -93,7 +92,7 @@
 
 <body>
     <div class="container">
-        <h2>Grant Access / Find Synonym query generator</h2>
+        <h2>Grant Access Query Generator</h2>
         <div class="form-group">
             <label for="user">User:</label>
             <textarea id="user" placeholder="Enter user" rows="2"></textarea>
@@ -102,7 +101,7 @@
             <label for="synonym">Synonym:</label>
             <textarea id="synonym" placeholder="Enter synonym name" rows="2"></textarea>
         </div>
-        <button onclick="findTables()">Find Tables</button>
+        <button onclick="findTables()">Find Tables Query</button>
 
         <div class="result" id="findTableQuery"></div>
 
@@ -110,7 +109,7 @@
             <label for="tables">Tables:</label>
             <textarea id="tables" placeholder="Enter table names" rows="3"></textarea>
         </div>
-
+        <button onclick="generateTables()">Generate Tables for Synonym with suffix OS001</button>
         <div class="form-group">
             <label for="accessType">Access Type:</label>
             <input id="accessType" placeholder="Enter access type" rows="3">
