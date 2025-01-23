@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Connection Manager</title>
+    <style>
+        /* Your existing styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            width: calc(100% - 300px);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-weight: 500;
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+        }
+
+        table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #5a67d8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4c51bf;
+        }
+
+        .icon {
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 18px;
+        }
+
+        .edit-icon {
+            color: #f39c12;
+        }
+
+        .delete-icon {
+            color: #e74c3c;
+        }
+
+        .copy-icon {
+            color: #3498db;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        input.editable-field {
+            width: 100px;
+            box-sizing: border-box;
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+
+        .pwd-copy-icon {
+            margin-right: 20px;
+         }
+
+
+         .flex-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.flex-container button {
+    display: flex;
+    align-items: center;  /* To align text and icon in the button */
+    padding: 8px 16px;
+    margin-bottom: 10px;
+}
+
+.flex-container button i {
+    margin-right: 8px;    /* Add some space between the icon and the text */
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Manage Database Connections</h2>
+
+        <div class="form-group">
+            <div class="flex-container">
+                <label for="jsonInput">Add Connection (JSON Array)</label>
+                <button onclick="copyAllConnections()">
+                    Copy Connections
+                </button>
+            </div>
+            <textarea id="jsonInput" rows="9"
+                placeholder='[{"db": "hana", "name": "JP5", "host": "10.222.34.17", "port": "30015", "user": "", "password": ""}]'></textarea>
+            <button onclick="addConnections()">Add Connections</button>
+        </div>
+
+        <h3>HANA Connections</h3>
+        <table id="hanaConnectionsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Host</th>
+                    <th>Port</th>
+                    <th>User</th>
+                    <th>Password</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h3>Oracle Connections</h3>
+        <table id="oracleConnectionsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Host</th>
+                    <th>Port</th>
+                    <th>Service Name</th>
+                    <th>User</th>
+                    <th>Password</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        let connections = JSON.parse(localStorage.getItem('connections')) || [];
+
+        function addConnections() {
+            const input = document.getElementById('jsonInput').value;
+            let newConnections;
+            try {
+                newConnections = JSON.parse(input);
+            } catch (e) {
+                alert('Invalid JSON format');
+                return;
+            }
+
+            newConnections.forEach(conn => {
+                conn.id = connections.length ? connections[connections.length - 1].id + 1 : 1; // Assign unique IDs
+                connections.push(conn);
+            });
+
+            localStorage.setItem('connections', JSON.stringify(connections));
+            updateTables();
+        }
+
+        function updateTables() {
+            const hanaTableBody = document.getElementById('hanaConnectionsTable').getElementsByTagName('tbody')[0];
+            const oracleTableBody = document.getElementById('oracleConnectionsTable').getElementsByTagName('tbody')[0];
+            hanaTableBody.innerHTML = '';
+            oracleTableBody.innerHTML = '';
+
+            connections.forEach((conn, index) => {
+                const row = document.createElement('tr');
+                if (conn.db === 'hana') {
+                    row.innerHTML = `
+                        <td>${conn.name}</td>
+                        <td>${conn.host}</td>
+                        <td>${conn.port}</td>
+                        <td>${conn.user}</td>
+                        <td>******** <span class="icon copy-icon pwd-copy-icon" style="float: right;" onclick="copyRowData(${conn.id}, 'pwd')">📋</span></td>
+                        <td>
+                            <span class="icon copy-icon" onclick="copyRowData(${conn.id})">📋</span>
+                            <span class="icon edit-icon" onclick="editConnection(${conn.id}, 'hana')">✏️</span>
+                            <span class="icon delete-icon" onclick="deleteConnection(${conn.id})">🗑️</span>
+                        </td>
+                    `;
+                    hanaTableBody.appendChild(row);
+                }
+
+                if (conn.db === 'oracle') {
+                    row.innerHTML = `
+                        <td>${conn.name}</td>
+                        <td>${conn.host}</td>
+                        <td>${conn.port}</td>
+                        <td>${conn.service_name || ''}</td>
+                        <td>${conn.user}</td>
+                        <td>********<span class="icon copy-icon pwd-copy-icon" style="float: right;" onclick="copyRowData(${conn.id}, 'pwd')">📋</span></td>
+                        <td>
+                            <span class="icon copy-icon" onclick="copyRowData(${conn.id})">📋</span>
+                            <span class="icon edit-icon" onclick="editConnection(${conn.id}, 'oracle')">✏️</span>
+                            <span class="icon delete-icon" onclick="deleteConnection(${conn.id})">🗑️</span>
+                        </td>
+                    `;
+                    oracleTableBody.appendChild(row);
+                }
+            });
+        }
+
+        function editConnection(id, dbType) {
+            const conn = connections.find(c => c.id === id);
+
+            const row = document.querySelector(`[onclick="editConnection(${id}, '${dbType}')"]`).closest('tr');
+            row.innerHTML = `
+                <td><input type="text" class="editable-field" value="${conn.name}" id="edit-name-${id}" /></td>
+                <td><input type="text" class="editable-field" value="${conn.host}" id="edit-host-${id}" /></td>
+                <td><input type="text" class="editable-field" value="${conn.port}" id="edit-port-${id}" /></td>
+                ${dbType === 'oracle'
+                    ? `<td><input type="text" class="editable-field" value="${conn.service_name || ''}" id="edit-service-${id}" /></td>`
+                    : ''
+                }
+                <td><input type="text" class="editable-field" value="${conn.user}" id="edit-user-${id}" /></td>
+                <td><input type="text" class="editable-field" value="${conn.password}" id="edit-password-${id}" /></td>
+                <td>
+                    <button onclick="saveConnection(${id}, '${dbType}')">Save</button>
+                    <button onclick="cancelEdit()">Cancel</button>
+                </td>
+            `;
+        }
+
+        function saveConnection(id, dbType) {
+            const connIndex = connections.findIndex(c => c.id === id);
+
+            connections[connIndex] = {
+                id,
+                db: dbType,
+                name: document.getElementById(`edit-name-${id}`).value,
+                host: document.getElementById(`edit-host-${id}`).value,
+                port: document.getElementById(`edit-port-${id}`).value,
+                service_name: dbType === 'oracle' ? document.getElementById(`edit-service-${id}`).value : undefined,
+                user: document.getElementById(`edit-user-${id}`).value,
+                password: document.getElementById(`edit-password-${id}`).value,
+            };
+
+            localStorage.setItem('connections', JSON.stringify(connections));
+            updateTables();
+        }
+
+        function cancelEdit() {
+            updateTables();
+        }
+
+        function deleteConnection(id) {
+            connections = connections.filter(conn => conn.id !== id);
+            reassignIds(); // Reassign IDs after deletion
+            localStorage.setItem('connections', JSON.stringify(connections));
+            updateTables();
+        }
+
+        function reassignIds() {
+                connections.forEach((conn, index) => {
+                    conn.id = index + 1; // Reassign IDs sequentially starting from 1
+                });
+            }
+
+
+        function copyRowData(id, type=null) {
+            let copyContent;
+            const conn = connections.find(c => c.id === id);
+            if(type=='pwd'){
+                copyContent = conn.password;
+            }else{
+                const { id, ...connDetails } = conn;
+                copyContent = JSON.stringify(connDetails);
+            }
+            navigator.clipboard.writeText(copyContent);                
+            
+            alert( type== 'pwd'? 'Password copied to clipboard!' : 'Connection details copied successfully!' );
+            }
+
+        function copyAllConnections(){
+            let conn = (JSON.parse(localStorage.getItem('connections')) || []).map(({ id, ...details }) => details);
+            conn = JSON.stringify(conn);
+            navigator.clipboard.writeText(conn);  
+            alert('Copied all connections!')
+
+        }
+
+        document.addEventListener('DOMContentLoaded', updateTables);
+    </script>
+</body>
+
+</html>
