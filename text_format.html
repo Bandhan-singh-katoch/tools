@@ -140,12 +140,141 @@
         margin-top: 30px;
        }
 
+       .row-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-block {
+            flex: 1;
+            display: flex;
+            gap: 5px;
+            align-items: flex-end;
+        }
+
+        .input-block input {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 14px;
+    height: 36px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.mini-btn {
+    padding: 8px 14px;
+    font-size: 14px;
+    height: 36px;
+    line-height: 1;
+    border: none;
+    border-radius: 4px;
+    background-color: #5a67d8;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mini-btn:hover {
+    background-color: #4c51bf;
+}
+
+.header-bar {
+  position: relative;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header-bar h2 {
+  margin: 0;
+  font-weight: 500;
+  font-size: 24px;
+}
+
+.tools-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.dropdown-toggle {
+  background-color: #e2e8f0;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  width: max-content;
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  z-index: 999;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dropdown-panel input {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.hidden {
+  display: none;
+}
+
+.column-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.row-inputs,
+.row-buttons {
+  display: contents; /* Let the buttons and inputs flow into the grid columns */
+}
+
+.row-buttons button {
+  width: 100%;
+}
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h2>Text Formatter</h2>
+        <div class="header-bar">
+            <h2>Text Formatter</h2>
+            <div class="tools-wrapper">
+                <button class="dropdown-toggle" onclick="toggleToolsDropdown()">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+                <div id="toolsDropdown" class="dropdown-panel hidden">
+                    <div class="dropdown-content">
+                        <input id="findText" placeholder="Find Text" />
+                        <input id="replaceText" placeholder="Replace With" />
+                        <button class="mini-btn" onclick="replaceTextInInput()">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>    </div>
 
         <div class="form-group">
             <div class="label-undo-btn">
@@ -167,45 +296,40 @@
             <textarea id="inputText" placeholder="Enter your sentence here" rows="4"></textarea>
         </div>
 
-        <div class="form-group">
-            <input id="separator" placeholder="Enter separator" />
-        </div>
-
-        <div class="button-row">
-            <button onclick="convertToUpperCase()">
-                <i class="fas fa-text-height"></i> Upper Case
-            </button>
-            <button onclick="convertToLowerCase()">
-                <i class="fas fa-text-width"></i> Lower Case
-            </button>
-            <button onclick="removeExtraSpaces()">
-                <i class="fas fa-broom"></i> Clean Text
-            </button>
-        </div>
-
-        <div class="button-row">
-            <button onclick="addSeparator()">
-                <i class="fas fa-plus"></i> Add Separator
-            </button>
-            <button onclick="surroundWithQuotes()">
-                <i class="fas fa-quote-right"></i> Double Quotes
-            </button>
-            <button onclick="convertToNewlineSeparated()">
-                <i class="fas fa-text-slash"></i> Newline
-            </button>
-        </div>
-
-        <div class="button-row">
-            <button onclick="createSql()">
-                <i class="fas fa-database"></i> Create SQL
-            </button>
-            <button onclick="extractColumns()">
-                <i class="fas fa-columns"></i> Extract Columns
-            </button>
-            <button id="toggleIframeBtn" onclick="toggleIframe()">
-                <i class="fas fa-columns"></i> Share text
-            </button>
-        </div>
+        <div class="column-wrapper">
+            <!-- Input Row (3 columns) -->
+            <div class="input-block">
+                <input id="separator" placeholder="Separator(default ,)" />
+            </div>
+            <div class="input-block">
+                <input id="prefixInput" placeholder="Prefix" />
+                <button class="mini-btn" onclick="addPrefix()"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="input-block">
+                <input id="suffixInput" placeholder="Suffix" />
+                <button class="mini-btn" onclick="addSuffix()"><i class="fas fa-plus"></i></button>
+            </div>
+        
+            <!-- Button Row 1 -->
+            <div class="row-buttons">
+                <button onclick="convertToUpperCase()"><i class="fas fa-text-height"></i> Upper Case</button>
+                <button onclick="convertToLowerCase()"><i class="fas fa-text-width"></i> Lower Case</button>
+                <button onclick="removeExtraSpaces()"><i class="fas fa-broom"></i> Clean Text</button>
+            </div>
+        
+            <!-- Button Row 2 -->
+            <div class="row-buttons">
+                <button onclick="addSeparator()"><i class="fas fa-plus"></i> Add Separator</button>
+                <button onclick="surroundWithQuotes()"><i class="fas fa-quote-right"></i> Double Quotes</button>
+                <button onclick="convertToNewlineSeparated()"><i class="fas fa-text-slash"></i> Newline</button>
+            </div>
+        
+            <!-- Button Row 3 -->
+            <div class="row-buttons">
+                <button onclick="createSql()"><i class="fas fa-database"></i> Create SQL</button>
+                <button onclick="extractColumns()"><i class="fas fa-columns"></i> Extract Columns</button>
+                <button onclick="toggleIframe()"><i class="fas fa-columns"></i> Share text</button>
+            </div>    </div>
 
 
         <div>
@@ -355,18 +479,6 @@
                     showCopied = false;
                     copyText()
                     window.open('https://codeshare.io/71939f4913d6c09f6323', '_blank');
-                    
-                    
-                    // const button = document.getElementById("toggleIframeBtn");
-                    // if (iframe.classList.contains("disabled")) {
-                    //     iframe.classList.remove("disabled");
-                    //     showCopied = false;
-                    //     copyText()
-                    //     // button.textContent = "Disable";
-                    // } else {
-                    //     iframe.classList.add("disabled");
-                    //     // button.textContent = "Enable";
-                    // }
                 }
 
             function insertText() {
@@ -392,6 +504,43 @@
                         }
                     };
                 }
+
+            function addPrefix() {
+                const prefix = document.getElementById('prefixInput').value;
+                if(prefix){
+                    saveState();
+                    const inputText = getInputText();
+                    const words = inputText.split(/[\s\n]+/).filter(str => str.trim().length > 0);
+                    const result = words.map(word => prefix + word).join(' ');
+                    setInputText(result);
+                }
+            }
+                
+            function addSuffix() {
+                saveState();
+                const suffix = document.getElementById('suffixInput').value || '';
+                const inputText = getInputText();
+                const words = inputText.split(/[\s\n]+/).filter(str => str.trim().length > 0);
+                const result = words.map(word => word + suffix).join(' ');
+                setInputText(result);
+            }
+
+            function toggleToolsDropdown() {
+                    const dropdown = document.getElementById('toolsDropdown');
+                    dropdown.classList.toggle('hidden');
+                }
+
+            function replaceTextInInput() {
+                const find = document.getElementById('findText').value;
+                const replace = document.getElementById('replaceText').value || "";
+                if(find){
+                    saveState();
+                    const input = document.getElementById('inputText');
+                    input.value = input.value.split(find).join(replace);
+                }
+            }
+
+
 
 
     </script>
