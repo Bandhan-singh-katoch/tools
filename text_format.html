@@ -300,6 +300,7 @@
             <!-- Input Row (3 columns) -->
             <div class="input-block">
                 <input id="separator" placeholder="Separator(default ,)" />
+                <button class="mini-btn" onclick="addSeparator()"><i class="fas fa-plus"></i></button>
             </div>
             <div class="input-block">
                 <input id="prefixInput" placeholder="Prefix" />
@@ -319,15 +320,14 @@
         
             <!-- Button Row 2 -->
             <div class="row-buttons">
-                <button onclick="addSeparator()"><i class="fas fa-plus"></i> Add Separator</button>
                 <button onclick="surroundWithQuotes()"><i class="fas fa-quote-right"></i> Double Quotes</button>
                 <button onclick="convertToNewlineSeparated()"><i class="fas fa-text-slash"></i> Newline</button>
+                <button onclick="extractColumns()"><i class="fas fa-columns"></i> Extract Columns</button>
             </div>
         
             <!-- Button Row 3 -->
             <div class="row-buttons">
                 <button onclick="createSql()"><i class="fas fa-database"></i> Create SQL</button>
-                <button onclick="extractColumns()"><i class="fas fa-columns"></i> Extract Columns</button>
                 <button onclick="toggleIframe()"><i class="fas fa-columns"></i> Share text</button>
             </div>    </div>
 
